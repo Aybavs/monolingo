@@ -1,0 +1,122 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") 
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+generator zod {
+  provider         = "zod-prisma-types"
+  output           = "src/zod"
+  createInputTypes = false
+  addIncludeType   = false
+  addSelectType    = false
+}
+// ---------------------------------------------------------------------
+// ENUM
+// ---------------------------------------------------------------------
+enum exercise_type_enum {
+  multiple_choice
+  translation
+  match
+  fill_blank
+}
+
+// ---------------------------------------------------------------------
+// MODELS
+// ---------------------------------------------------------------------
+model languages {
+  language_id   Int       @id @default(autoincrement())
+  language_name String    @unique
+
+  // İlişkiler
+  users     users[]
+  chapters  chapters[]
+}
+
+model users {
+  user_id         Int      @id @default(autoincrement())
+  username        String   @unique
+  email           String   @unique
+  password_hash   String
+  date_joined     DateTime
+  // current_language_id -> languages.language_id
+  current_language_id Int?
+  current_language    languages? @relation(fields: [current_language_id], references: [language_id], onDelete: SetNull)
+
+  // İlişkiler
+  user_progress      user_progress[]
+  user_achievements user_achievements[]
+}
+
+model chapters {
+  chapter_id   Int      @id @default(autoincrement())
+  chapter_name String
+  // language_id -> languages.language_id
+  language_id  Int
+  language     languages @relation(fields: [language_id], references: [language_id], onDelete: Cascade)
+
+  // İlişkiler
+  lessons lessons[]
+}
+
+model lessons {
+  lesson_id    Int      @id @default(autoincrement())
+  // chapter_id -> chapters.chapter_id
+  chapter_id   Int
+  chapter      chapters @relation(fields: [chapter_id], references: [chapter_id], onDelete: Cascade)
+
+  lesson_title String
+  lesson_order Int
+  is_completed Boolean?
+
+  // İlişkiler
+  exercises      exercises[]
+  user_progress  user_progress[]
+}
+
+model exercises {
+  exercise_id   Int      @id @default(autoincrement())
+  // lesson_id -> lessons.lesson_id
+  lesson_id     Int
+  lesson        lessons   @relation(fields: [lesson_id], references: [lesson_id], onDelete: Cascade)
+
+  exercise_type exercise_type_enum
+  question      String
+  answer        String
+}
+
+model user_progress {
+  progress_id  Int      @id @default(autoincrement())
+  // user_id -> users.user_id
+  user_id      Int
+  user         users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  // lesson_id -> lessons.lesson_id
+  lesson_id    Int
+  lesson       lessons  @relation(fields: [lesson_id], references: [lesson_id], onDelete: Cascade)
+
+  completed_at DateTime?
+}
+
+model achievements {
+  achievement_id Int      @id @default(autoincrement())
+  name           String
+  description    String?
+  icon_url       String?
+
+  // İlişkiler
+  user_achievements user_achievements[]
+}
+
+model user_achievements {
+  user_achievement_id Int      @id @default(autoincrement())
+  // user_id -> users.user_id
+  user_id            Int
+  user               users        @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  // achievement_id -> achievements.achievement_id
+  achievement_id     Int
+  achievement        achievements @relation(fields: [achievement_id], references: [achievement_id], onDelete: Cascade)
+
+  earned_at          DateTime?
+}
