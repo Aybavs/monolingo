@@ -1,6 +1,8 @@
-import axios from "axios";
-import { getAuthHeaders } from "../auth/AuthHelper";
-import { URL } from "@/lib/constants";
+import axios from 'axios';
+
+import { URL } from '@/lib/constants';
+
+import { getAuthHeaders } from '../auth/AuthHelper';
 
 // Axios instance
 const axiosInstance = axios.create({

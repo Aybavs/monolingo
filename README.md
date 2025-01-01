@@ -11,7 +11,7 @@ Monolingo, kullanıcıların dil öğrenme sürecini daha etkili ve eğlenceli h
 Proje dosyalarını yerel bilgisayarınıza klonlayın:
 
 ```bash
-git clone <https://github.com/Aybavs/monolingo>
+git clone https://github.com/Aybavs/monolingo
 cd monolingo
 ```
 

@@ -1,8 +1,10 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from 'react';
+
+import { AuthContext } from '@/context/AuthContext';
+import { post } from '@/services/api'; // ApiHelper'ı kullanıyoruz
+
 import type { User } from "@/types";
-import { AuthContext } from "@/context/AuthContext";
-import { post } from "@/services/api"; // ApiHelper'ı kullanıyoruz
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -45,7 +47,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   ) => {
     try {
       setIsLoading(true);
-      const response = await post("/auth/login", { username, email, password });
+      const response = await post("/auth/register", {
+        username,
+        email,
+        password,
+      });
       setIsAuthenticated(true);
       setUser(response.user);
       sessionStorage.setItem("token", response.token);
