@@ -1,17 +1,22 @@
 "use client";
 
-import Image from 'next/image';
-import { useContext } from 'react';
-import { useForm } from 'react-hook-form';
+import Image from "next/image";
+import { useForm } from "react-hook-form";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { AuthContext } from '@/context/AuthContext';
-import { cn } from '@/lib/utils';
-import { registerSchema } from '@/schemas/registerSchema';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks";
+import { cn } from "@/lib/utils";
+import { registerSchema } from "@/schemas/registerSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { z } from "zod";
 export function RegisterForm({
@@ -31,11 +36,7 @@ export function RegisterForm({
   });
 
   // AuthContext üzerinden register fonksiyonunu alıyoruz
-  const authContext = useContext(AuthContext);
-  if (!authContext) {
-    throw new Error("AuthContext must be used within an AuthProvider");
-  }
-  const { register } = authContext;
+  const { register } = useAuth();
 
   // Form gönderildiğinde çalışacak fonksiyon
   async function onSubmit(values: z.infer<typeof registerSchema>) {

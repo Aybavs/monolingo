@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import './globals.css';
+import "./globals.css";
 
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono } from "next/font/google";
 
-import { AuthProvider } from '@/providers'; // Senin AuthProvider'ın
-import { MyThemeProvider } from '@/providers/ThemeProvider';
+import { AuthProvider } from "@/providers";
+import { MyThemeProvider } from "@/providers";
+import { UserProvider } from "@/providers";
 
 // Google Fontlar
 const geistSans = Geist({
@@ -33,8 +34,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          {/* Tema yönetimini sağlayan provider'ı AuthProvider veya üst/alt sırada sarmalayabilirsin */}
-          <MyThemeProvider>{children}</MyThemeProvider>
+          <UserProvider>
+            <MyThemeProvider>{children}</MyThemeProvider>
+          </UserProvider>
         </AuthProvider>
       </body>
     </html>

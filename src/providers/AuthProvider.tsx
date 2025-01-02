@@ -1,8 +1,14 @@
 "use client";
-import { useCallback, useState } from 'react';
 
-import { AuthContext } from '@/context/AuthContext';
-import { post } from '@/services/api'; // ApiHelper'ı kullanıyoruz
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { AuthContext } from "@/context";
+import {
+  login as loginService,
+  logout as logoutService,
+  register as registerService,
+} from "@/lib/auth/authService"; // Fonksiyonları içe aktarıyoruz
 
 import type { User } from "@/types";
 
@@ -11,14 +17,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const response = await post("/auth/login", { email, password });
+      const user = await loginService(email, password); // login fonksiyonunu çağır
       setIsAuthenticated(true);
-      setUser(response.user);
-      sessionStorage.setItem("token", response.token);
+      setUser(user);
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -31,10 +37,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = useCallback(async () => {
     try {
-      await post("/logout"); // Logout için API çağrısı
+      await logoutService(); // logout fonksiyonunu çağır
       setIsAuthenticated(false);
       setUser(null);
-      sessionStorage.removeItem("token"); // Token'ı temizleme
     } catch (err) {
       console.error("Logout failed:", err);
     }
@@ -47,14 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   ) => {
     try {
       setIsLoading(true);
-      const response = await post("/auth/register", {
-        username,
-        email,
-        password,
-      });
-      setIsAuthenticated(true);
-      setUser(response.user);
-      sessionStorage.setItem("token", response.token);
+      const response = await registerService(username, email, password); // register fonksiyonunu çağır
+      console.log("Register successful:", response.message);
+      router.push("/auth/login");
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";

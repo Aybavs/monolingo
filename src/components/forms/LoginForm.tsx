@@ -1,19 +1,24 @@
 "use client";
 
-import Image from 'next/image';
-import { useContext } from 'react';
-import { useForm } from 'react-hook-form';
+import Image from "next/image";
+import { useForm } from "react-hook-form";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { AuthContext } from '@/context/AuthContext';
-import { cn } from '@/lib/utils';
-import { loginSchema } from '@/schemas/loginSchema';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { loginSchema } from "@/schemas/loginSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { z } from "zod";
+import { useAuth } from "@/hooks";
 
 export function LoginForm({
   className,
@@ -27,12 +32,7 @@ export function LoginForm({
     },
   });
 
-  // Get login function from AuthContext
-  const authContext = useContext(AuthContext);
-  if (!authContext) {
-    throw new Error("AuthContext must be used within an AuthProvider");
-  }
-  const { login } = authContext;
+  const { login } = useAuth();
 
   // Submit handler
   async function onSubmit(values: z.infer<typeof loginSchema>) {
