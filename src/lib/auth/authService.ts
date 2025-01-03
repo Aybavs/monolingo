@@ -13,8 +13,8 @@ export const login = async (email: string, password: string) => {
 
 // Kullanıcı çıkış yapma fonksiyonu
 export const logout = async () => {
-  await post("/logout"); // Logout için API çağrısı
-  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; sameSite=Strict;";
+  document.cookie =
+    "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; sameSite=Strict;";
 };
 
 // Kullanıcı kayıt fonksiyonu

@@ -1,1 +1,1 @@
-export { get, post, patch, remove } from "./ApiHelper";
+export { get, post, put, remove, getWithParams } from "./ApiHelper";

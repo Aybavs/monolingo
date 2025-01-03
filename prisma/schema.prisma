@@ -41,13 +41,13 @@ model users {
   email           String   @unique
   password_hash   String
   date_joined     DateTime
-  // current_language_id -> languages.language_id
-  current_language_id Int?
+  current_language_id Int? @default(1)
   current_language    languages? @relation(fields: [current_language_id], references: [language_id], onDelete: SetNull)
+  user_role       String   @default("user") // Varsayılan olarak 'user'
 
   // İlişkiler
   user_progress      user_progress[]
-  user_achievements user_achievements[]
+  user_achievements  user_achievements[]
 }
 
 model chapters {

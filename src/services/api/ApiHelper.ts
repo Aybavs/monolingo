@@ -1,8 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
-import { URL } from '@/lib/constants';
+import { URL } from "@/lib/constants";
 
-import { getAuthHeaders } from '../auth/AuthHelper';
+import { getAuthHeaders } from "../auth/AuthHelper";
 
 // Axios instance
 const axiosInstance = axios.create({
@@ -25,6 +25,17 @@ export const get = async (endpoint: string) => {
   }
 };
 
+export const getWithParams = async (endpoint: string, body?: object) => {
+  try {
+    const response = await axiosInstance.post(endpoint, body, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 // POST
 export const post = async (endpoint: string, data?: object | null) => {
   try {
@@ -37,10 +48,10 @@ export const post = async (endpoint: string, data?: object | null) => {
   }
 };
 
-// PATCH
-export const patch = async (endpoint: string, data?: object | null) => {
+// PUT
+export const put = async (endpoint: string, data?: object | null) => {
   try {
-    const response = await axiosInstance.patch(endpoint, data, {
+    const response = await axiosInstance.put(endpoint, data, {
       headers: getAuthHeaders(),
     });
     return response.data;

@@ -1,44 +1,71 @@
 "use client";
+import React from "react";
 
 import DashboardCard from "@/components/admin/DashboardCard";
 import Chart from "@/components/admin/DashboardChart";
+import {
+  getTotalUsers,
+  getTotalLessons,
+  getTotalExercises,
+} from "@/lib/admin/adminService";
 
-const mockData = [
+const initialData = [
   {
     id: 1,
-    title: "Total Revenue",
-    value: "$45,231.89",
+    title: "Total Users",
+    value: "",
     icon: <span>$</span>,
-    change: "+20.1% from last month",
     description: "",
   },
   {
     id: 2,
-    title: "Subscriptions",
-    value: "+2350",
+    title: "Total Lessons",
+    value: "",
     icon: <span>👥</span>,
-    change: "+180.1% from last month",
     description: "",
   },
   {
     id: 3,
-    title: "Sales",
-    value: "+12,234",
+    title: "Total Exercises",
+    value: "",
     icon: <span>💳</span>,
-    change: "+19% from last month",
     description: "",
   },
   {
     id: 4,
-    title: "Active Now",
-    value: "+573",
+    title: "Total Languages",
+    value: "1",
     icon: <span>📈</span>,
-    change: "+201 since last hour",
     description: "",
   },
 ];
 
 const Dashboard = () => {
+  const [mockData, setMockData] = React.useState(initialData);
+
+  React.useEffect(() => {
+    getTotalUsers().then((data) => {
+      setMockData((prevData) => {
+        const newData = [...prevData];
+        newData[0].value = data.count.toString();
+        return newData;
+      });
+    });
+    getTotalLessons().then((data) => {
+      setMockData((prevData) => {
+        const newData = [...prevData];
+        newData[1].value = data.count.toString();
+        return newData;
+      });
+    });
+    getTotalExercises().then((data) => {
+      setMockData((prevData) => {
+        const newData = [...prevData];
+        newData[2].value = data.count.toString();
+        return newData;
+      });
+    });
+  }, []);
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-2xl font-bold">Dashboard</h2>
@@ -49,7 +76,6 @@ const Dashboard = () => {
             title={item.title}
             value={item.value}
             icon={item.icon}
-            change={item.change}
             description={item.description}
           />
         ))}

@@ -40,10 +40,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await logoutService(); // logout fonksiyonunu çağır
       setIsAuthenticated(false);
       setUser(null);
+      router.push("/auth/login");
     } catch (err) {
       console.error("Logout failed:", err);
     }
-  }, []);
+  }, [router]);
 
   const register = async (
     username: string,

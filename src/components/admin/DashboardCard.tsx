@@ -4,7 +4,6 @@ interface DashboardCardProps {
   title: string;
   value: string | number;
   icon: React.ReactNode;
-  change: string;
   description: string;
 }
 
@@ -12,7 +11,6 @@ const DashboardCard = ({
   title,
   value,
   icon,
-  change,
   description,
 }: DashboardCardProps) => {
   return (
@@ -23,7 +21,6 @@ const DashboardCard = ({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        <div className=" text-sm">{change}</div>
         <div className=" text-xs">{description}</div>
       </CardContent>
     </Card>

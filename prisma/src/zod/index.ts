@@ -1,5 +1,4 @@
 import { z } from 'zod';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { Prisma } from '@prisma/client';
 
 /////////////////////////////////////////
@@ -15,7 +14,7 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const LanguagesScalarFieldEnumSchema = z.enum(['language_id','language_name']);
 
-export const UsersScalarFieldEnumSchema = z.enum(['user_id','username','email','password_hash','date_joined','current_language_id']);
+export const UsersScalarFieldEnumSchema = z.enum(['user_id','username','email','password_hash','date_joined','current_language_id','user_role']);
 
 export const ChaptersScalarFieldEnumSchema = z.enum(['chapter_id','chapter_name','language_id']);
 
@@ -65,6 +64,7 @@ export const usersSchema = z.object({
   password_hash: z.string(),
   date_joined: z.coerce.date(),
   current_language_id: z.number().int().nullable(),
+  user_role: z.string(),
 })
 
 export type users = z.infer<typeof usersSchema>
