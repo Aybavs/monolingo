@@ -4,12 +4,13 @@ export const getAuthHeaders = () => {
     .find((row) => row.startsWith("token="))
     ?.split("=")[1];
 
-  if (!token) {
-    throw new Error("Token bulunamadı! Lütfen giriş yapmayı kontrol edin.");
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
+  return headers;
 };

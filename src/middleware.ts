@@ -1,41 +1,49 @@
+import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
 
+import type { NextRequest } from "next/server";
 const SECRET_KEY = process.env.JWT_SECRET || "default_secret_key";
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value || "";
   const { pathname, origin } = req.nextUrl;
 
   // Token yoksa yetkisiz sayfaya yönlendir
   if (!token) {
-    console.log("Token bulunamadı.");
+    console.log("Token bulunamadı. Yetkisiz sayfaya yönlendiriliyor.");
     if (pathname.startsWith("/learn") || pathname.startsWith("/admin")) {
       return NextResponse.redirect(new URL("/unauthorized", origin));
     }
     return NextResponse.next();
   }
 
-  // Token doğrula
   try {
-    const decodedToken = jwt.verify(token, SECRET_KEY) as { role: string };
-    console.log("Token geçerli. Rol:", decodedToken.role);
+    // Token doğrula
+    const decodedToken = await jwtVerify(
+      token,
+      new TextEncoder().encode(SECRET_KEY)
+    );
 
-    // Admin kontrolü
-    if (pathname.startsWith("/admin") && decodedToken.role !== "ADMIN") {
+    const { role } = decodedToken.payload;
+
+    console.log("Token geçerli. Kullanıcı rolü:", role);
+
+    // Admin sayfasına erişim kontrolü
+    if (pathname.startsWith("/admin") && role !== "admin") {
+      console.log("Yetersiz yetki: Admin alanına erişim reddedildi.");
       return NextResponse.redirect(new URL("/unauthorized", origin));
     }
 
-    // Kullanıcı kontrolü
-    if (pathname.startsWith("/learn") && decodedToken.role !== "USER") {
+    // Kullanıcı sayfasına erişim kontrolü
+    if (pathname.startsWith("/learn") && role !== "user") {
+      console.log("Yetersiz yetki: Kullanıcı alanına erişim reddedildi.");
       return NextResponse.redirect(new URL("/unauthorized", origin));
     }
 
+    // Tüm kontroller geçtiyse devam et
     return NextResponse.next();
   } catch (err) {
     console.error("Token doğrulama hatası:", err);
-    req.cookies.delete("token");
     return NextResponse.redirect(new URL("/auth/login", origin));
   }
 }

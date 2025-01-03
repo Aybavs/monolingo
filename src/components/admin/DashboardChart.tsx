@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
-import { Card } from "../ui/card";
-import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { getUsersByDate } from "@/lib/admin";
+import { useEffect, useState } from 'react';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+
+import { type ChartConfig, ChartContainer } from '@/components/ui/chart';
+import { getUsersByDate } from '@/lib/admin';
+
+import { Card } from '../ui/card';
 
 const chartConfig = {
   desktop: {
@@ -18,9 +20,11 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const Chart = () => {
-  const [chartData, setChartData] = useState<any[]>([]);
-  const startDate = "2024-12-23";
-  const endDate = "2025-01-02";
+  const [chartData, setChartData] = useState<unknown[]>([]);
+  const endDate = new Date().toISOString().split("T")[0];
+  const startDate = new Date(new Date().setDate(new Date().getDate() - 10))
+    .toISOString()
+    .split("T")[0];
 
   useEffect(() => {
     const fetchChartData = async () => {
@@ -29,10 +33,10 @@ const Chart = () => {
 
         // Verileri günlük bazda gruplama
         const groupedData: Record<string, number> = {};
-        users.forEach((user: any) => {
+        for (const user of users as { date_joined: string }[]) {
           const date = new Date(user.date_joined).toISOString().split("T")[0];
           groupedData[date] = (groupedData[date] || 0) + 1;
-        });
+        }
 
         // Chart için verileri formatlama
         const formattedData = Object.entries(groupedData).map(
@@ -49,7 +53,7 @@ const Chart = () => {
     };
 
     fetchChartData();
-  }, []);
+  }, [endDate, startDate]);
 
   return (
     <Card className="p-6">

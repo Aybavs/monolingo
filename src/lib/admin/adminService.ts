@@ -1,4 +1,4 @@
-import { get, put } from "@/services/api";
+import { get, post, put, remove } from "@/services/api";
 import { getWithParams } from "@/services/api/ApiHelper";
 
 export const getTotalUsers = async () => {
@@ -20,9 +20,27 @@ export const getUsersByDate = async (startDate: string, endDate: string) => {
 
 export const updateUser = async (userId: number, updatedData: any) => {
   try {
-    return await put(`/admin/users/${userId}`, updatedData);
+    return await put(`/admin/updateUserByAdmin/${userId}`, updatedData);
   } catch (error) {
     console.error("Failed to update user:", error);
-    throw error; // Hata yakalayıp frontend'e iletmek için
+    throw error;
+  }
+};
+
+export const deleteUser = async (userId: number) => {
+  try {
+    return await remove(`/admin/deleteUserByAdmin/${userId}`);
+  } catch (error) {
+    console.error("Failed to delete user:", error);
+    throw error;
+  }
+};
+
+export const addUser = async (userData: any) => {
+  try {
+    return await post("/admin/addUserByAdmin", userData);
+  } catch (error) {
+    console.error("Failed to add user:", error);
+    throw error;
   }
 };

@@ -1,37 +1,48 @@
 "use client";
+import { MoreHorizontal, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { useState, useEffect } from "react";
-import { DataTable } from "@/components/admin/UserTable";
+import { DataTable } from '@/components/admin/DataTable';
+import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
+    Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle
+} from '@/components/ui/dialog';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { getUsersByDate, updateUser } from "@/lib/admin/adminService";
-import { MoreHorizontal } from "lucide-react";
+    DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from '@/components/ui/select';
+import { addUser, deleteUser, getUsersByDate, updateUser } from '@/lib/admin/adminService';
+import { passwordSchema } from '@/schemas/passwords';
 
 const UsersPage = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editUser, setEditUser] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newUser, setNewUser] = useState({
+    username: "",
+    email: "",
+    user_role: "user",
+    password: "",
+  });
+  const [userToDelete, setUserToDelete] = useState<any>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const startDate = "2024-12-23";
-        const endDate = "2025-01-02";
+        const startDate = new Date(
+          new Date().setDate(new Date().getDate() - 10)
+        )
+          .toISOString()
+          .split("T")[0];
+        const endDate = new Date().toISOString().split("T")[0];
         const users = await getUsersByDate(startDate, endDate);
         setData(users);
       } catch (error) {
@@ -42,15 +53,45 @@ const UsersPage = () => {
     fetchUsers();
   }, []);
 
-  const handleEdit = (user: any) => {
-    setSelectedUser(user);
-    setIsDialogOpen(true);
+  const handleAdd = async () => {
+    try {
+      const isValid = passwordSchema.safeParse(newUser.password).success;
+      if (!isValid) {
+        setPasswordError(
+          passwordError || "Password does not meet the criteria."
+        );
+        return;
+      }
+      const addedUser = await addUser(newUser);
+      setData((prevData) => [...prevData, addedUser]);
+      setIsAddDialogOpen(false);
+      setNewUser({ username: "", email: "", user_role: "user", password: "" });
+    } catch (error) {
+      console.error("Failed to add user:", error);
+    }
   };
 
-  const handleDelete = async (userId: number) => {
+  const handleEdit = (user: any) => {
+    setSelectedUser(user);
+    setEditUser({ ...user, password: "" }); // Kullanıcı mevcut değerleriyle başlat, şifre boş
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (user: any) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      console.log(`Delete user with ID: ${userId}`);
-      // Silme işlemi için API çağrısı yapılabilir.
+      if (userToDelete) {
+        await deleteUser(userToDelete.user_id);
+        setData((prevData) =>
+          prevData.filter((user: any) => user.user_id !== userToDelete.user_id)
+        );
+      }
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
     } catch (error) {
       console.error("Failed to delete user:", error);
     }
@@ -58,14 +99,37 @@ const UsersPage = () => {
 
   const handleSave = async () => {
     try {
-      if (selectedUser) {
-        await updateUser(selectedUser.user_id, selectedUser);
-        console.log("User updated successfully");
-        setIsDialogOpen(false);
+      if (
+        editUser.password &&
+        !passwordSchema.safeParse(editUser.password).success
+      ) {
+        setPasswordError("Password does not meet the criteria.");
+        return;
       }
+
+      const userToUpdate = {
+        ...editUser,
+        password: editUser.password || undefined, // Şifre yoksa güncellenmeyecek
+      };
+
+      await updateUser(selectedUser.user_id, userToUpdate);
+
+      setData((prevData) =>
+        prevData.map((user: any) =>
+          user.user_id === selectedUser.user_id ? userToUpdate : user
+        )
+      );
+
+      console.log("User updated successfully");
+      setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Failed to update user:", error);
     }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setEditUser((prev: any) => ({ ...prev, [field]: value }));
+    if (field === "password") setPasswordError(null); // Şifre değişirse hatayı sıfırla
   };
 
   const columns = [
@@ -111,7 +175,7 @@ const UsersPage = () => {
               <DropdownMenuItem onClick={() => handleEdit(user)}>
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleDelete(user.user_id)}>
+              <DropdownMenuItem onClick={() => handleDelete(user)}>
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -123,61 +187,146 @@ const UsersPage = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Users</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">Users</h1>
+        <Button variant="default" onClick={() => setIsAddDialogOpen(true)}>
+          <Plus className="mr-2" />
+          Add User
+        </Button>
+      </div>
       <DataTable columns={columns} data={data} />
+      {/* Add Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="add-username">Username</Label>
+              <Input
+                id="add-username"
+                value={newUser.username}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, username: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-email">Email</Label>
+              <Input
+                id="add-email"
+                value={newUser.email}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-password">Password</Label>
+              <Input
+                id="add-password"
+                type="password"
+                value={newUser.password || ""}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, password: e.target.value })
+                }
+              />
+            </div>
 
+            <div>
+              <Label htmlFor="add-role">Role</Label>
+              <Select
+                value={newUser.user_role}
+                onValueChange={(value) =>
+                  setNewUser({ ...newUser, user_role: value })
+                }
+              >
+                <SelectTrigger id="add-role">
+                  <SelectValue placeholder="Select Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAdd}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="edit-username">Username</Label>
               <Input
-                id="username"
-                value={selectedUser?.username || ""}
-                onChange={(e) =>
-                  setSelectedUser({
-                    ...selectedUser,
-                    username: e.target.value,
-                  })
-                }
+                id="edit-username"
+                value={editUser?.username || ""}
+                onChange={(e) => handleInputChange("username", e.target.value)}
               />
             </div>
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="edit-email">Email</Label>
               <Input
-                id="email"
-                value={selectedUser?.email || ""}
-                onChange={(e) =>
-                  setSelectedUser({
-                    ...selectedUser,
-                    email: e.target.value,
-                  })
-                }
+                id="edit-email"
+                value={editUser?.email || ""}
+                onChange={(e) => handleInputChange("email", e.target.value)}
               />
             </div>
             <div>
-              <Label htmlFor="role">Role</Label>
-              <Input
-                id="role"
-                value={selectedUser?.user_role || ""}
-                onChange={(e) =>
-                  setSelectedUser({
-                    ...selectedUser,
-                    user_role: e.target.value,
-                  })
-                }
-              />
+              <Label htmlFor="edit-role">Role</Label>
+              <Select
+                value={editUser?.user_role || ""}
+                onValueChange={(value) => handleInputChange("user_role", value)}
+              >
+                <SelectTrigger id="edit-role">
+                  <SelectValue placeholder="Select Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleSave}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this user?</p>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
