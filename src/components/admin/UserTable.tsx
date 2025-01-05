@@ -10,13 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { User } from "@/types/user";
 
 const UserTable = ({
   data,
   onEdit,
 }: {
-  data: any[];
-  onEdit: (user: any) => void;
+  data: User[];
+  onEdit: (user: User) => void;
 }) => {
   const columns = [
     {
@@ -34,8 +35,8 @@ const UserTable = ({
     {
       accessorKey: "date_joined",
       header: "Date Joined",
-      cell: ({ getValue }: any) =>
-        new Date(getValue()).toLocaleDateString("en-US", {
+      cell: ({ getValue }: { getValue: () => unknown }) =>
+        new Date(getValue() as string).toLocaleDateString("tr-TR", {
           year: "numeric",
           month: "short",
           day: "numeric",
@@ -48,7 +49,7 @@ const UserTable = ({
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: User } }) => {
         const user = row.original;
         return (
           <DropdownMenu>

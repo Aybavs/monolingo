@@ -1,7 +1,10 @@
+import type { passwordSchema } from "@/schemas/passwords";
 export interface User {
-  id: string;
-  name: string;
+  user_id?: string;
+  username: string;
   email: string;
+  date_joined?: string;
+  password: typeof passwordSchema;
   role: "user" | "admin";
 }
 

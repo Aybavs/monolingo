@@ -8,9 +8,10 @@ import {
   login as loginService,
   logout as logoutService,
   register as registerService,
-} from "@/lib/auth/authService"; // Fonksiyonları içe aktarıyoruz
+} from "@/lib/auth/authService";
 
 import type { User } from "@/types";
+import { decode } from "jsonwebtoken";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,10 +23,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const user = await loginService(email, password); // login fonksiyonunu çağır
-      setIsAuthenticated(true);
+
+      // Login service çağrısı
+      const token = await loginService(email, password);
+
+      if (!token) {
+        throw new Error("Token alınamadı.");
+      }
+
+      // Token'ı decode et
+      const decodedToken = decode(token) as User | null;
+
+      if (!decodedToken) {
+        throw new Error("Token decode edilemedi.");
+      }
+
+      // User ataması
+      const { userId, username, exp, iat, role } = decodedToken;
+
+      const user: User = {
+        userId,
+        username,
+        exp,
+        iat,
+        role,
+      };
+
       setUser(user);
+      setIsAuthenticated(true);
       setError(null);
+
+      // Role'e göre yönlendirme
+      if (user.role === "admin") {
+        router.push("/admin/dashboard");
+      } else if (user.role === "user") {
+        router.push("/learn");
+      } else {
+        throw new Error("Geçersiz kullanıcı rolü.");
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       console.error("Login failed:", errorMessage);
@@ -53,8 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   ) => {
     try {
       setIsLoading(true);
-      const response = await registerService(username, email, password); // register fonksiyonunu çağır
-      console.log("Register successful:", response.message);
+      await registerService(username, email, password);
       router.push("/auth/login");
       setError(null);
     } catch (err) {

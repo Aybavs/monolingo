@@ -1,8 +1,9 @@
 // Kullanıcı bilgisi
 export interface User {
-  id: string;
-  name: string;
-  email: string;
+  userId: number;
+  username: string;
+  exp: number;
+  iat: number;
   role: "user" | "admin";
 }
 
@@ -21,14 +22,4 @@ export interface AuthContextType {
   error: string | null;
 }
 
-// Giriş ve çıkış API istekleri için türler
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  token: string;
-  user: User;
-}
 export type UserRole = "user" | "admin";

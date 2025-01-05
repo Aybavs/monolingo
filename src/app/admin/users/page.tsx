@@ -1,22 +1,39 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { MoreHorizontal, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { MoreHorizontal, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 
-import { DataTable } from '@/components/admin/DataTable';
-import { Button } from '@/components/ui/button';
+import { DataTable } from "@/components/admin/DataTable";
+import { Button } from "@/components/ui/button";
 import {
-    Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle
-} from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
-    DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
-} from '@/components/ui/select';
-import { addUser, deleteUser, getUsersByDate, updateUser } from '@/lib/admin/adminService';
-import { passwordSchema } from '@/schemas/passwords';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  addUser,
+  deleteUser,
+  getUsersByDate,
+  updateUser,
+} from "@/lib/admin/adminService";
+import { passwordSchema } from "@/schemas/passwords";
 
 const UsersPage = () => {
   const [data, setData] = useState<any[]>([]);
@@ -28,7 +45,7 @@ const UsersPage = () => {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
-    user_role: "user",
+    user_role: "",
     password: "",
   });
   const [userToDelete, setUserToDelete] = useState<any>(null);

@@ -1,5 +1,6 @@
 import { get, post, put, remove } from "@/services/api";
 import { getWithParams } from "@/services/api/ApiHelper";
+import type { User } from "@/types/user";
 
 export const getTotalUsers = async () => {
   return await get("/admin/countUsers");
@@ -18,7 +19,7 @@ export const getUsersByDate = async (startDate: string, endDate: string) => {
   return await getWithParams("/admin/usersByDate", body);
 };
 
-export const updateUser = async (userId: number, updatedData: any) => {
+export const updateUser = async (userId: number, updatedData: never) => {
   try {
     return await put(`/admin/updateUserByAdmin/${userId}`, updatedData);
   } catch (error) {
@@ -36,7 +37,7 @@ export const deleteUser = async (userId: number) => {
   }
 };
 
-export const addUser = async (userData: any) => {
+export const addUser = async (userData: User) => {
   try {
     return await post("/admin/addUserByAdmin", userData);
   } catch (error) {
