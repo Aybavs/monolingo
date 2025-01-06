@@ -62,9 +62,39 @@ const ChaptersPage = () => {
 
   const handleAdd = async () => {
     try {
-      const addedChapter = await addChapter(newChapter);
-      setData((prevData) => [...prevData, addedChapter]);
+      // Validate chapter data before sending
+      if (!newChapter.chapter_name.trim()) {
+        alert("Chapter name cannot be empty");
+        return;
+      }
+
+      if (newChapter.language_id <= 0) {
+        alert("Language ID must be greater than 0");
+        return;
+      }
+
+      // Create chapter data without ID since it's auto-generated
+      const chapterData = {
+        chapter_name: newChapter.chapter_name.trim(),
+        language_id: newChapter.language_id
+      };
+
+      const addedChapter = await addChapter(chapterData);
+
+      // Update the state with properly structured data
+      setData((prevData) => [
+        ...prevData, 
+        {
+          chapter_id: addedChapter.chapter_id,
+          chapter_name: addedChapter.chapter_name,
+          language_id: addedChapter.language_id
+        }
+      ]);
+
       setIsAddDialogOpen(false);
+      window.location.reload();
+      
+      // Reset form
       setNewChapter({
         chapter_id: 0,
         chapter_name: "",
@@ -72,6 +102,7 @@ const ChaptersPage = () => {
       });
     } catch (error) {
       console.error("Failed to add chapter:", error);
+      alert("Failed to add chapter. Please try again.");
     }
   };
 

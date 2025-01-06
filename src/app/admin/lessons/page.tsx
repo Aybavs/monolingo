@@ -51,7 +51,7 @@ const LessonsPage = () => {
   useEffect(() => {
     const fetchLessons = async () => {
       try {
-        const lessons = await getLessons(); // Simply get all lessons
+        const lessons = await getLessons();
         setData(lessons);
       } catch (error) {
         console.error("Failed to fetch lessons:", error);
@@ -139,6 +139,14 @@ const LessonsPage = () => {
       header: "Lesson Name",
     },
     {
+      accessorKey: "chapter_id",
+      header: "Chapter ID",
+    },
+    {
+      accessorKey: "lesson_order",
+      header: "Lesson Order",
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: ({ row }: any) => {
@@ -200,7 +208,36 @@ const LessonsPage = () => {
                 }
               />
             </div>
+            <div>
+              <Label htmlFor="add-lesson-chapter">Chapter ID</Label>
+              <Input
+                id="add-lesson-chapter"
+                type="number"
+                value={newLesson.chapter_id}
+                onChange={(e) =>
+                  setNewLesson({
+                    ...newLesson,
+                    chapter_id: parseInt(e.target.value),
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-lesson-order">Lesson Order</Label>
+              <Input
+                id="add-lesson-order"
+                type="number"
+                value={newLesson.lesson_order}
+                onChange={(e) =>
+                  setNewLesson({
+                    ...newLesson,
+                    lesson_order: parseInt(e.target.value),
+                  })
+                }
+              />
+            </div>
           </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               Cancel
@@ -225,6 +262,34 @@ const LessonsPage = () => {
                   setEditLesson((prev) => ({
                     ...prev!,
                     lesson_title: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-lesson-chapter">Chapter ID</Label>
+              <Input
+                id="edit-lesson-chapter"
+                type="number"
+                value={editLesson?.chapter_id || ""}
+                onChange={(e) =>
+                  setEditLesson((prev) => ({
+                    ...prev!,
+                    chapter_id: parseInt(e.target.value),
+                  }))
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-lesson-order">Lesson Order</Label>
+              <Input
+                id="edit-lesson-order"
+                type="number"
+                value={editLesson?.lesson_order || ""}
+                onChange={(e) =>
+                  setEditLesson((prev) => ({
+                    ...prev!,
+                    lesson_order: parseInt(e.target.value),
                   }))
                 }
               />

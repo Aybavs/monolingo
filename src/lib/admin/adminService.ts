@@ -95,11 +95,15 @@ interface Lesson {
   lesson_title: string;
   lesson_order: number;
 }
-
+export enum ExerciseType {
+  MULTIPLE_CHOICE = "multiple_choice",
+  FILL_IN_THE_BLANK = "fill_in_the_blank",
+  TRUE_OR_FALSE = "translation",
+}
 export interface Exercise {
   exercise_id: number;
   lesson_id: number;
-  exercise_type: string;
+  exercise_type: ExerciseType;
   question: string;
   answer: string;
 }

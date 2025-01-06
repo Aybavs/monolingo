@@ -10,14 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  Home,
-  Users,
-  BookOpen,
-  ListChecks,
-  Settings as SettingsIcon,
-  LogOut,
-} from "lucide-react";
+import { Home, Users, BookOpen, ListChecks, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks";
 import { Separator } from "@/components/ui/separator";
@@ -50,11 +43,6 @@ const items = [
     title: "Exercises",
     url: "/admin/exercises",
     icon: ListChecks,
-  },
-  {
-    title: "Settings",
-    url: "/admin/settings",
-    icon: SettingsIcon,
   },
 ];
 
