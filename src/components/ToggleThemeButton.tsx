@@ -10,12 +10,6 @@ export default function ToggleThemeButton() {
 
   return (
     <div className="flex items-center space-x-2">
-      <label
-        htmlFor="theme-switch"
-        className="text-sm font-medium text-gray-900 dark:text-gray-100"
-      >
-        {isDarkMode ? "Dark Mode" : "Light Mode"}
-      </label>
       <Switch
         id="theme-switch"
         checked={isDarkMode}

@@ -2,7 +2,6 @@
 import Navbar from "@/components/Navbar";
 import { CheckCircle, Lock, Star, ChevronDown, ChevronUp } from "lucide-react"; // İkonlar
 import { motion, AnimatePresence } from "framer-motion";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import {
@@ -12,6 +11,7 @@ import {
 } from "@/lib/user/userService";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 // Add this type
 interface ChapterProgress {
@@ -27,7 +27,7 @@ const LearnPage = () => {
     [key: number]: { lesson_id: number; lesson_title: string }[];
   }>({});
   const [completedLessons, setCompletedLessons] = useState<number[]>([]);
-  const [expandedChapters, setExpandedChapters] = useState<number[]>([]); // Açık chapter'lar
+  const [expandedChapters, setExpandedChapters] = useState<number[]>([]);
   const [chapterProgress, setChapterProgress] = useState<{
     [key: number]: ChapterProgress;
   }>({});
@@ -37,6 +37,7 @@ const LearnPage = () => {
     (acc, lessonArray) => acc + lessonArray.length,
     0
   );
+  const router = useRouter(); // Router for navigation
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -44,7 +45,10 @@ const LearnPage = () => {
         setLoading(true);
 
         const chapterData = await getChapters();
-        setChapters(chapterData);
+        const sortedChapters = chapterData.sort(
+          (a, b) => a.chapter_id - b.chapter_id
+        );
+        setChapters(sortedChapters);
 
         const allLessons: { [key: number]: any[] } = {};
         const lessonPromises = chapterData.map(
@@ -93,6 +97,10 @@ const LearnPage = () => {
     );
   };
 
+  const navigateToLesson = (lessonId: number) => {
+    router.push(`/lesson?lesson_id=${lessonId}`);
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -132,7 +140,14 @@ const LearnPage = () => {
         </div>
         <div className="space-y-8">
           {chapters.map((chapter, chapterIndex) => (
-            <div key={chapter.chapter_id} className="mb-8">
+            <div
+              key={
+                [...chapters]
+                  .sort((a, b) => a.chapter_id - b.chapter_id)
+                  .find((c) => c.chapter_id === chapter.chapter_id)?.chapter_id
+              }
+              className="mb-8"
+            >
               {/* Chapter Başlık */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -213,13 +228,31 @@ const LearnPage = () => {
                               className={clsx(
                                 "relative group p-10 m-3 rounded-full",
                                 "transition-all duration-300 transform",
-                                "hover:shadow-lg hover:shadow-yellow-500/25",
+                                "hover:shadow-lg",
                                 {
+                                  "hover:shadow-green-500/25":
+                                    completedLessons.includes(lesson.lesson_id),
+                                  "hover:shadow-yellow-500/25":
+                                    !completedLessons.includes(
+                                      lesson.lesson_id
+                                    ),
+                                  "bg-green-500 hover:bg-green-600":
+                                    completedLessons.includes(lesson.lesson_id),
                                   "bg-yellow-500 hover:bg-yellow-600":
-                                    isLessonAvailable,
+                                    isLessonAvailable &&
+                                    !completedLessons.includes(
+                                      lesson.lesson_id
+                                    ),
                                   "bg-gray-500": !isLessonAvailable,
                                 }
                               )}
+                              disabled={completedLessons.includes(
+                                lesson.lesson_id
+                              )}
+                              onClick={() =>
+                                isLessonAvailable &&
+                                navigateToLesson(lesson.lesson_id)
+                              }
                             >
                               {completedLessons.includes(lesson.lesson_id) ? (
                                 <CheckCircle

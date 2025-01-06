@@ -25,14 +25,21 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+interface FilterConfig {
+  placeholder: string;
+  columnKey: string;
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  filters?: FilterConfig[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  filters,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -58,25 +65,22 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center space-x-4 py-4">
         {/* Username Filter */}
-        <Input
-          placeholder="Filter by username..."
-          value={
-            (table.getColumn("username")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("username")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        {/* Email Filter */}
-        <Input
-          placeholder="Filter by email..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        {filters?.map((filter) => (
+          <Input
+            key={filter.columnKey}
+            placeholder={filter.placeholder}
+            value={
+              (table.getColumn(filter.columnKey)?.getFilterValue() as string) ??
+              ""
+            }
+            onChange={(event) =>
+              table
+                .getColumn(filter.columnKey)
+                ?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        ))}
       </div>
       <div className="rounded-md border">
         <Table>

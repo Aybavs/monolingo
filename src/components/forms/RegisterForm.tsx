@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -48,35 +47,12 @@ export function RegisterForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create your account</CardTitle>
-          <CardDescription>Sign up with your Google account</CardDescription>
+          <CardDescription>Sign up with your credentials</CardDescription>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-6">
-              {/* Google ile devam et */}
-              <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full">
-                  {/* Google ikonu */}
-                  <Image
-                    className="mr-2 dark:invert"
-                    src="/google.svg"
-                    alt="Google logo"
-                    width={16}
-                    height={16}
-                    priority
-                  />
-                  Sign up with Google
-                </Button>
-              </div>
-
-              {/* Bölücü çizgi */}
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-
               {/* Form alanları */}
               <div className="grid gap-6">
                 {/* Username */}

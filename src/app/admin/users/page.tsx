@@ -45,7 +45,7 @@ const UsersPage = () => {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
-    user_role: "",
+    user_role: "user" as "user" | "admin",
     password: "",
   });
   const [userToDelete, setUserToDelete] = useState<any>(null);
@@ -211,7 +211,14 @@ const UsersPage = () => {
           Add User
         </Button>
       </div>
-      <DataTable columns={columns} data={data} />
+      <DataTable
+        columns={columns}
+        data={data}
+        filters={[
+          { placeholder: "Filter by username...", columnKey: "username" },
+          { placeholder: "Filter by email...", columnKey: "email" },
+        ]}
+      />
       {/* Add Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
@@ -256,7 +263,7 @@ const UsersPage = () => {
               <Select
                 value={newUser.user_role}
                 onValueChange={(value) =>
-                  setNewUser({ ...newUser, user_role: value })
+                  setNewUser({ ...newUser, user_role: value as "user" | "admin" })
                 }
               >
                 <SelectTrigger id="add-role">
