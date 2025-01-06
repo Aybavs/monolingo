@@ -8,6 +8,7 @@ import {
   getChapters,
   getLessons,
   getCompletedLessons,
+  getCredits,
 } from "@/lib/user/userService";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
@@ -31,6 +32,7 @@ const LearnPage = () => {
   const [chapterProgress, setChapterProgress] = useState<{
     [key: number]: ChapterProgress;
   }>({});
+  const [credits, setCredits] = useState<number>(0);
 
   const [loading, setLoading] = useState(true);
   const totalLessons = Object.values(lessons).reduce(
@@ -65,6 +67,17 @@ const LearnPage = () => {
           ? completedData.map((lesson) => lesson.lesson_id)
           : [];
         setCompletedLessons(completedLessonIds);
+
+        const fetchCredits = async () => {
+          try {
+            const response = await getCredits();
+            setCredits(response.credits); // Updated to access credits from response object
+          } catch (error) {
+            console.error("Error fetching credits:", error);
+          }
+        };
+
+        fetchCredits();
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -98,6 +111,10 @@ const LearnPage = () => {
   };
 
   const navigateToLesson = (lessonId: number) => {
+    if (credits <= 0) {
+      alert("Krediniz olmadığı için derse giremezsiniz.");
+      return;
+    }
     router.push(`/lesson?lesson_id=${lessonId}`);
   };
 
@@ -118,10 +135,10 @@ const LearnPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex flex-col items-center">
       <Navbar />
 
-      <main className="flex-1 p-6 w-full max-w-4xl mx-auto overflow-y-scroll scrollbar-hide">
+      <main className="flex-1 p-6 w-full  max-w-4xl mx-auto overflow-y-scroll scrollbar-hide">
         {/* Add Progress Bar Here */}
         <div className="max-w-3xl mx-auto mb-8">
           <div className="bg-gray-700/50 rounded-full h-3 mb-2">
@@ -152,7 +169,7 @@ const LearnPage = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full p-4 bg-zinc-600 text-white rounded-lg shadow-md"
+                className="w-full p-4 bg-purple-950 text-white rounded-lg shadow-md"
                 onClick={() => toggleChapter(chapter.chapter_id)}
               >
                 <div className="flex justify-between items-center w-full space-y-2">

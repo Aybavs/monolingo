@@ -75,3 +75,23 @@ export const playAudio = async (text: string) => {
     throw error;
   }
 };
+
+export const getCredits = async () => {
+  try {
+    return await get("/credits");
+  } catch (error) {
+    console.error("Error fetching credits:", error);
+    throw error;
+  }
+};
+
+export const addCredits = async (amount: number) => {
+  try {
+    return await post("/credits/add", {
+      amount: amount,
+    });
+  } catch (error) {
+    console.error("Error adding credits:", error);
+    throw error;
+  }
+};

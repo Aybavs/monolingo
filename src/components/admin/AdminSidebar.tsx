@@ -15,7 +15,6 @@ import {
   Users,
   BookOpen,
   ListChecks,
-  Trophy,
   Settings as SettingsIcon,
   LogOut,
 } from "lucide-react";
@@ -51,11 +50,6 @@ const items = [
     title: "Exercises",
     url: "/admin/exercises",
     icon: ListChecks,
-  },
-  {
-    title: "Achievements",
-    url: "/admin/achievements",
-    icon: Trophy,
   },
   {
     title: "Settings",
