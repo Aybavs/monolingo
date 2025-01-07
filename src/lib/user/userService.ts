@@ -1,4 +1,5 @@
 import { get, post } from "@/services/api";
+import { userAgent } from "next/server";
 
 // Tüm chapterları getirme fonksiyonu
 export const getChapters = async () => {
@@ -81,6 +82,18 @@ export const getCredits = async () => {
     return await get("/credits");
   } catch (error) {
     console.error("Error fetching credits:", error);
+    throw error;
+  }
+};
+
+export const payment = async (amount: number) => {
+  try {
+    return await post("/payment/payment", {
+      amount: amount,
+      payment_method: "credit_card",
+    });
+  } catch (error) {
+    console.error("Error making payment:", error);
     throw error;
   }
 };

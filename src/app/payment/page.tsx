@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { addCredits } from "@/lib/user/userService";
+import { addCredits, payment } from "@/lib/user/userService";
 import { useRouter } from "next/navigation";
 
 export default function PaymentPage() {
@@ -38,6 +38,7 @@ export default function PaymentPage() {
     e.preventDefault();
     if (!validateForm()) return;
     try {
+      await payment(parseInt(amount));
       await addCredits(parseInt(amount));
       alert("Ödeme başarılı! Learn sayfasına yönlendiriliyorsunuz.");
       router.push("/learn");
@@ -49,15 +50,11 @@ export default function PaymentPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md border-4 rounded-xl shadow-lg p-8 space-y-6 transition-all duration-300 hover:shadow-xl">
-        <h2 className="text-2xl font-bold text-center mb-6">
-          Ödeme Ekranı
-        </h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Ödeme Ekranı</h2>
 
         <form onSubmit={handlePayment} className="space-y-4">
           <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Kredi Adedi
-            </label>
+            <label className="block text-sm font-medium">Kredi Adedi</label>
             <input
               type="number"
               placeholder="Örn: 100"
@@ -69,15 +66,13 @@ export default function PaymentPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Kart Numarası
-            </label>
+            <label className="block text-sm font-medium">Kart Numarası</label>
             <input
               type="text"
               placeholder="**** **** **** ****"
               value={cardNumber}
               onChange={(e) => {
-                const input = e.target.value.replace(/\D/g, '').slice(0, 16);
+                const input = e.target.value.replace(/\D/g, "").slice(0, 16);
                 setCardNumber(input);
               }}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-colors"
@@ -94,7 +89,7 @@ export default function PaymentPage() {
                 placeholder="AA/YY"
                 value={expiry}
                 onChange={(e) => {
-                  const input = e.target.value.replace(/\D/g, '').slice(0, 4);
+                  const input = e.target.value.replace(/\D/g, "").slice(0, 4);
                   if (input.length >= 2) {
                     setExpiry(`${input.slice(0, 2)}/${input.slice(2)}`);
                   } else {
@@ -114,7 +109,7 @@ export default function PaymentPage() {
                 placeholder="***"
                 value={cvv}
                 onChange={(e) => {
-                  const input = e.target.value.replace(/\D/g, '').slice(0, 3);
+                  const input = e.target.value.replace(/\D/g, "").slice(0, 3);
                   setCvv(input);
                 }}
                 maxLength={3}
