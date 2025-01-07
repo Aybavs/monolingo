@@ -17,7 +17,7 @@ export default function AdminLayout({
       <div className="flex h-screen w-screen">
         <AdminSidebar />
         <div className="flex-1 flex flex-col border">
-          <AdminNavbar adminUsername={user?.username || "Aybars Keles"} />
+          <AdminNavbar adminUsername={user?.username || "Aybavs"} />
           <main className="flex-1 p-6">{children}</main>
         </div>
       </div>

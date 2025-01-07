@@ -47,21 +47,21 @@ const Dashboard = () => {
     getTotalUsers().then((data) => {
       setMockData((prevData) => {
         const newData = [...prevData];
-        newData[0].value = data.count.toString();
+        newData[0].value = data.count;
         return newData;
       });
     });
     getTotalLessons().then((data) => {
       setMockData((prevData) => {
         const newData = [...prevData];
-        newData[1].value = data.count.toString();
+        newData[1].value = data.count;
         return newData;
       });
     });
     getTotalExercises().then((data) => {
       setMockData((prevData) => {
         const newData = [...prevData];
-        newData[2].value = data.count.toString();
+        newData[2].value = data.count;
         return newData;
       });
     });

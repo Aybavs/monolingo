@@ -7,6 +7,10 @@ interface Chapter {
   language_id: number;
 }
 
+export const getAllUsers = async () => {
+  return await get("/admin/allUsers");
+};
+
 export const getTotalUsers = async () => {
   return await get("/admin/countUsers");
 };
@@ -97,8 +101,8 @@ interface Lesson {
 }
 export enum ExerciseType {
   MULTIPLE_CHOICE = "multiple_choice",
-  FILL_IN_THE_BLANK = "fill_in_the_blank",
-  TRUE_OR_FALSE = "translation",
+  FILL_IN_THE_BLANK = "fill_blank",
+  TRANSLATION = "translation",
 }
 export interface Exercise {
   exercise_id: number;

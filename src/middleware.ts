@@ -26,8 +26,6 @@ export async function middleware(req: NextRequest) {
 
     const { role } = decodedToken.payload;
 
-    console.log("Token geçerli. Kullanıcı rolü:", role);
-
     // Admin sayfasına erişim kontrolü
     if (pathname.startsWith("/admin") && role !== "admin") {
       console.log("Yetersiz yetki: Admin alanına erişim reddedildi.");
