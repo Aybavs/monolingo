@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import ToggleThemeButton from "@/components/ToggleThemeButton";
 import { useAuth } from "@/hooks/useAuth";
 import { getCredits } from "@/lib/user/userService";
 import { useEffect, useState } from "react";
@@ -47,13 +46,12 @@ const Navbar = () => {
             +
           </Button>
         </div>
-        <ToggleThemeButton />
         <Button
           variant="ghost"
           onClick={logout}
           className="p-3 text-red-500 hover:bg-red-100 dark:hover:bg-red-800 rounded-full "
         >
-          <IoLogOut  />
+          <IoLogOut />
         </Button>
       </div>
     </nav>

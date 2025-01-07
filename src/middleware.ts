@@ -10,7 +10,6 @@ export async function middleware(req: NextRequest) {
 
   // Token yoksa yetkisiz sayfaya yönlendir
   if (!token) {
-    console.log("Token bulunamadı. Yetkisiz sayfaya yönlendiriliyor.");
     if (pathname.startsWith("/learn") || pathname.startsWith("/admin")) {
       return NextResponse.redirect(new URL("/unauthorized", origin));
     }
@@ -38,7 +37,14 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/unauthorized", origin));
     }
 
+    if (pathname.startsWith("/auth/login")) {
+      console.log("Kullanıcı zaten giriş yapmış. Yönlendiriliyor...");
+      const redirectPath = role === "admin" ? "/admin/dashboard" : "/learn";
+      return NextResponse.redirect(new URL(redirectPath, origin));
+    }
+
     // Tüm kontroller geçtiyse devam et
+    console.log("Token doğrulama başarılı. İşlem devam ediyor...");
     return NextResponse.next();
   } catch (err) {
     console.error("Token doğrulama hatası:", err);
@@ -46,6 +52,4 @@ export async function middleware(req: NextRequest) {
   }
 }
 
-export const config = {
-  matcher: ["/admin/:path*", "/learn/:path*"],
-};
+export const config = {};
